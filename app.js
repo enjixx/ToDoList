@@ -4,6 +4,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const date = require(__dirname + "/date.js");
 const mongoose= require("mongoose");
+const _ = require("lodash");
 
 const app = express();
 
@@ -14,7 +15,7 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static("public"));
 
 //Establish connection to the database
-mongoose.connect("mongodb://localhost:27017/todolistDB", {useNewUrlParser:true, useUnifiedTopology: true});
+mongoose.connect("mongodb://localhost:27017/todolistDB", {useNewUrlParser:true, useUnifiedTopology: true, useFindAndModify: false});
 
 //New todoList Schema
 const itemsSchema = new mongoose.Schema({
@@ -75,7 +76,7 @@ app.get("/", function(req, res){
 
 
 app.get("/:customListName", function(req, res){
-    const customListName = req.params.customListName;
+    const customListName = _.startCase(_.toLower(req.params.customListName));
 
     let day = date.getDate();
 
@@ -88,6 +89,7 @@ app.get("/:customListName", function(req, res){
             });
             //save the new custom list in the database
             list.save();
+            console.log("new list created called " + customListName);
             //redirect 
             res.redirect("/" + customListName);
         }else {
@@ -99,8 +101,6 @@ app.get("/:customListName", function(req, res){
 });
     
     
-
-
 app.post("/", function(req, res){
 
    const itemName = req.body.newItem;
