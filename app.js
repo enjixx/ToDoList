@@ -15,7 +15,7 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static("public"));
 
 //Establish connection to the database
-mongoose.connect("mongodb://localhost:27017/todolistDB", {useNewUrlParser:true, useUnifiedTopology: true, useFindAndModify: false});
+mongoose.connect("mongodb+srv://enji_k:Enjilove1@cluster0.7brfw.mongodb.net/todolistDB?retryWrites=true&w=majority", {useNewUrlParser:true, useUnifiedTopology: true, useFindAndModify: false});
 
 //New todoList Schema
 const itemsSchema = new mongoose.Schema({
@@ -82,21 +82,24 @@ app.get("/:customListName", function(req, res){
 
     List.findOne({name: customListName}, function(err, results){
         if(!err){
-            if(!results){
+            if(customListName !== "Favicon Ico"){
+                if(!results){
                const list = new List({
                 name: customListName,
                 items: defaultItems 
-            });
-            //save the new custom list in the database
-            list.save();
-            console.log("new list created called " + customListName);
-            //redirect 
-            res.redirect("/" + customListName);
-        }else {
-            //show existing list
-            res.render("list", {listDate: day, listTitle:results.name,  newListItem: results.items});
+                });
+                //save the new custom list in the database
+                list.save();
+                console.log("new list created called " + customListName);
+                //redirect 
+                res.redirect("/" + customListName);
+                }else {
+                    //show existing list
+                    res.render("list", {listDate: day, listTitle:results.name,  newListItem: results.items});
+                }
+            }
         }
-        }
+            
     });
 });
     
